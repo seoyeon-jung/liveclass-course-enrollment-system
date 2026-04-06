@@ -40,4 +40,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleIllegalState(IllegalStateException e) {
         return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
     }
+
+    @ExceptionHandler(EnrollmentNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEnrollmentNotFound(EnrollmentNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(e.getMessage()));
+    }
 }
