@@ -25,4 +25,19 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("서버 오류가 발생했습니다."));
     }
+
+    @ExceptionHandler(CourseNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCourseNotFound(CourseNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalState(IllegalStateException e) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+    }
 }
