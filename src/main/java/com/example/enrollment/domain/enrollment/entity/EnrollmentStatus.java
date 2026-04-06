@@ -1,4 +1,7 @@
 package com.example.enrollment.domain.enrollment.entity;
 
-public class EnrollmentStatus {
+public enum EnrollmentStatus {
+    PENDING,
+    CONFIRMED,
+    CANCELLED
 }
