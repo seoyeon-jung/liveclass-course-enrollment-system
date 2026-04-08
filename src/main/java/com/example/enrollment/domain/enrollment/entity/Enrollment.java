@@ -30,6 +30,8 @@ public class Enrollment {
     @Column(nullable = false)
     private EnrollmentStatus status;
 
+    private LocalDateTime confirmedAt;  // 결제 확정 시간
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -51,6 +53,7 @@ public class Enrollment {
             throw new IllegalStateException("결제 대기 상태에서만 확정할 수 있습니다.");
         }
         this.status = EnrollmentStatus.CONFIRMED;
+        this.confirmedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
@@ -59,6 +62,14 @@ public class Enrollment {
         if (this.status == EnrollmentStatus.CANCELLED) {
             throw new IllegalStateException("이미 취소된 수강 신청입니다.");
         }
+
+        // CONFIRMED 인 경우 7일 이내만 취소 가능
+        if (this.status == EnrollmentStatus.CONFIRMED) {
+            if (this.confirmedAt == null || this.confirmedAt.plusDays(7).isBefore(LocalDateTime.now())) {
+                throw new IllegalStateException("결제 확정 후 7일이 지나 취소할 수 없습니다.");
+            }
+        }
+
         this.status = EnrollmentStatus.CANCELLED;
         this.updatedAt = LocalDateTime.now();
     }
