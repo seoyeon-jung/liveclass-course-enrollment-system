@@ -28,8 +28,7 @@
 
 ### 1. 레포지토리 클론
 ```bash
-git clone https://github.com/{username}/{repo-name}.git
-cd {repo-name}
+git clone https://github.com/seoyeon-jung/liveclass-course-enrollment-system
 ```
 
 ### 2. 환경변수 설정
@@ -512,3 +511,4 @@ docker-compose up -d
 - 동시성 처리 방식 (비관적 락 vs 낙관적 락) 비교 검토
 - 테스트 코드 초안 생성
 - 발생한 버그 (취소 시 상태 검증 순서, Jackson 설정 오류 등) 원인 분석
+- 리드미 초안 생성
