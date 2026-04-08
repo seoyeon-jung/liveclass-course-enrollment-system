@@ -84,3 +84,13 @@ X-User-Id: 999
 {
   "status": "OPEN"
 }
+
+### 강의별 수강생 목록 조회 (크리에이터 전용)
+GET http://localhost:8080/courses/1/enrollments
+X-User-Id: 1
+
+###
+
+### 강의별 수강생 목록 조회 - 본인 강의 아닌 경우 (실패)
+GET http://localhost:8080/courses/1/enrollments
+X-User-Id: 999
