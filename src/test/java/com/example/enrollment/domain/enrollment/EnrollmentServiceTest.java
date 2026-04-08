@@ -17,8 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -246,5 +248,47 @@ public class EnrollmentServiceTest {
         // then
         assertThat(responses).hasSize(1);
         assertThat(responses.get(0).getUserId()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("결제 확정 후 7일 이내 취소 성공")
+    void 결제_확정_후_7일_이내_취소_성공() {
+        // given
+        openCourse.increaseCount();
+        Enrollment enrollment = Enrollment.builder()
+                .userId(2L)
+                .course(openCourse)
+                .build();
+        enrollment.confirm(); // CONFIRMED 상태로 변경 (confirmedAt = now)
+        given(enrollmentRepository.findById(1L)).willReturn(Optional.of(enrollment));
+
+        // when
+        EnrollmentResponse response = enrollmentService.cancel(1L, 2L);
+
+        // then
+        assertThat(response.getStatus()).isEqualTo(EnrollmentStatus.CANCELLED);
+    }
+
+    @Test
+    @DisplayName("결제 확정 후 7일 초과 시 취소 실패")
+    void 결제_확정_후_7일_초과_취소_실패() {
+        // given
+        openCourse.increaseCount();
+        Enrollment enrollment = Enrollment.builder()
+                .userId(2L)
+                .course(openCourse)
+                .build();
+        enrollment.confirm();
+
+        // confirmedAt을 8일 전으로 강제 설정
+        ReflectionTestUtils.setField(enrollment, "confirmedAt",
+                LocalDateTime.now().minusDays(8));
+
+        given(enrollmentRepository.findById(1L)).willReturn(Optional.of(enrollment));
+
+        // when & then
+        assertThatThrownBy(() -> enrollmentService.cancel(1L, 2L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("결제 확정 후 7일이 지나 취소할 수 없습니다.");
     }
 }
