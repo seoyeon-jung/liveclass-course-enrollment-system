@@ -4,6 +4,7 @@ import com.example.enrollment.domain.course.entity.Course;
 import com.example.enrollment.domain.course.repository.CourseRepository;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentCreateRequest;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentResponse;
+import com.example.enrollment.domain.enrollment.dto.EnrollmentStudentResponse;
 import com.example.enrollment.domain.enrollment.entity.Enrollment;
 import com.example.enrollment.domain.enrollment.entity.EnrollmentStatus;
 import com.example.enrollment.domain.enrollment.repository.EnrollmentRepository;
@@ -105,6 +106,22 @@ public class EnrollmentService {
         return enrollmentRepository.findAllByUserId(userId)
                 .stream()
                 .map(EnrollmentResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    // 강의별 수강생 목록 조회
+    public List<EnrollmentStudentResponse> getCourseEnrollments(Long courseId, Long creatorId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException(courseId));
+
+        // 본인 강의만 조회 가능
+        if (!course.getCreatorId().equals(creatorId)) {
+            throw new UnauthorizedException("본인의 강의만 조회할 수 있습니다.");
+        }
+
+        return enrollmentRepository.findAllByCourseId(courseId)
+                .stream()
+                .map(EnrollmentStudentResponse::new)
                 .collect(Collectors.toList());
     }
 }

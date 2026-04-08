@@ -5,6 +5,7 @@ import com.example.enrollment.domain.course.entity.CourseStatus;
 import com.example.enrollment.domain.course.repository.CourseRepository;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentCreateRequest;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentResponse;
+import com.example.enrollment.domain.enrollment.dto.EnrollmentStudentResponse;
 import com.example.enrollment.domain.enrollment.entity.Enrollment;
 import com.example.enrollment.domain.enrollment.entity.EnrollmentStatus;
 import com.example.enrollment.domain.enrollment.repository.EnrollmentRepository;
@@ -290,5 +291,36 @@ public class EnrollmentServiceTest {
         assertThatThrownBy(() -> enrollmentService.cancel(1L, 2L))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("결제 확정 후 7일이 지나 취소할 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("강의별 수강생 목록 조회 성공")
+    void 강의별_수강생_목록_조회_성공() {
+        // given
+        Enrollment enrollment = Enrollment.builder()
+                .userId(2L)
+                .course(openCourse)
+                .build();
+        given(courseRepository.findById(1L)).willReturn(Optional.of(openCourse));
+        given(enrollmentRepository.findAllByCourseId(1L)).willReturn(List.of(enrollment));
+
+        // when
+        List<EnrollmentStudentResponse> responses = enrollmentService.getCourseEnrollments(1L, 1L);
+
+        // then
+        assertThat(responses).hasSize(1);
+        assertThat(responses.get(0).getUserId()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("본인 강의 아닌 경우 수강생 목록 조회 실패")
+    void 본인_강의_아닌_경우_수강생_목록_조회_실패() {
+        // given
+        given(courseRepository.findById(1L)).willReturn(Optional.of(openCourse));
+
+        // when & then
+        assertThatThrownBy(() -> enrollmentService.getCourseEnrollments(1L, 999L))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessageContaining("본인의 강의만 조회할 수 있습니다.");
     }
 }
