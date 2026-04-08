@@ -1,4 +1,10 @@
 package com.example.enrollment.global.exception;
 
-public class UnauthorizedException {
+import org.springframework.http.HttpStatus;
+
+public class UnauthorizedException extends BaseException {
+
+    public UnauthorizedException (String  message) {
+        super(message, HttpStatus.FORBIDDEN);
+    }
 }
