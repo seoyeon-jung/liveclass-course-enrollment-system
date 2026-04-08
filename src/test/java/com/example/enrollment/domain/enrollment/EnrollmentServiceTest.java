@@ -4,6 +4,7 @@ import com.example.enrollment.domain.course.entity.Course;
 import com.example.enrollment.domain.course.entity.CourseStatus;
 import com.example.enrollment.domain.course.repository.CourseRepository;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentCreateRequest;
+import com.example.enrollment.domain.enrollment.dto.EnrollmentPageResponse;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentResponse;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentStudentResponse;
 import com.example.enrollment.domain.enrollment.entity.Enrollment;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
@@ -234,21 +236,27 @@ public class EnrollmentServiceTest {
     }
 
     @Test
-    @DisplayName("내 수강 신청 목록 조회 성공")
+    @DisplayName("내 수강 신청 목록 조회 성공 (페이지네이션)")
     void 내_수강_신청_목록_조회_성공() {
         // given
         Enrollment enrollment = Enrollment.builder()
                 .userId(2L)
                 .course(openCourse)
                 .build();
-        given(enrollmentRepository.findAllByUserId(2L)).willReturn(List.of(enrollment));
+
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+        Page<Enrollment> enrollmentPage = new PageImpl<>(List.of(enrollment), pageable, 1);
+
+        given(enrollmentRepository.findAllByUserId(2L, pageable)).willReturn(enrollmentPage);
 
         // when
-        List<EnrollmentResponse> responses = enrollmentService.getMyEnrollments(2L);
+        EnrollmentPageResponse response = enrollmentService.getMyEnrollments(2L, 0, 10);
 
         // then
-        assertThat(responses).hasSize(1);
-        assertThat(responses.get(0).getUserId()).isEqualTo(2L);
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getTotalElements()).isEqualTo(1);
+        assertThat(response.getTotalPages()).isEqualTo(1);
+        assertThat(response.isLast()).isTrue();
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.example.enrollment.presentation.enrollment;
 
 import com.example.enrollment.domain.enrollment.dto.EnrollmentCreateRequest;
+import com.example.enrollment.domain.enrollment.dto.EnrollmentPageResponse;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentResponse;
 import com.example.enrollment.domain.enrollment.service.EnrollmentService;
 import com.example.enrollment.global.response.ApiResponse;
@@ -41,8 +42,10 @@ public class EnrollmentController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<List<EnrollmentResponse>>> getMyEnrollments(
-            @RequestHeader("X-User-Id") Long userId) {
-        return ResponseEntity.ok(ApiResponse.ok(enrollmentService.getMyEnrollments(userId)));
+    public ResponseEntity<ApiResponse<EnrollmentPageResponse>> getMyEnrollments(
+            @RequestHeader("X-User-Id") Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(ApiResponse.ok(enrollmentService.getMyEnrollments(userId, page, size)));
     }
 }

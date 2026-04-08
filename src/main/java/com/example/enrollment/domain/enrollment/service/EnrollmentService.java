@@ -3,6 +3,7 @@ package com.example.enrollment.domain.enrollment.service;
 import com.example.enrollment.domain.course.entity.Course;
 import com.example.enrollment.domain.course.repository.CourseRepository;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentCreateRequest;
+import com.example.enrollment.domain.enrollment.dto.EnrollmentPageResponse;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentResponse;
 import com.example.enrollment.domain.enrollment.dto.EnrollmentStudentResponse;
 import com.example.enrollment.domain.enrollment.entity.Enrollment;
@@ -12,6 +13,10 @@ import com.example.enrollment.global.exception.CourseNotFoundException;
 import com.example.enrollment.global.exception.EnrollmentNotFoundException;
 import com.example.enrollment.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,11 +107,14 @@ public class EnrollmentService {
     }
 
     // 내 수강 신청 목록 조회
-    public List<EnrollmentResponse> getMyEnrollments(Long userId) {
-        return enrollmentRepository.findAllByUserId(userId)
-                .stream()
-                .map(EnrollmentResponse::new)
-                .collect(Collectors.toList());
+    public EnrollmentPageResponse getMyEnrollments(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<EnrollmentResponse> result = enrollmentRepository
+                .findAllByUserId(userId, pageable)
+                .map(EnrollmentResponse::new);
+
+        return new EnrollmentPageResponse(result);
     }
 
     // 강의별 수강생 목록 조회
