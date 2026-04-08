@@ -13,4 +13,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     // 중복 신청 체크 (CANCELLED X)
     boolean existsByUserIdAndCourseIdAndStatusNot(Long userId, Long courseId, EnrollmentStatus status);
+
+    // 강의별 수강생 목록 조회
+    List<Enrollment> findAllByCourseId(Long courseId);
 }
