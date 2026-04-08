@@ -9,6 +9,7 @@ import com.example.enrollment.domain.enrollment.entity.EnrollmentStatus;
 import com.example.enrollment.domain.enrollment.repository.EnrollmentRepository;
 import com.example.enrollment.global.exception.CourseNotFoundException;
 import com.example.enrollment.global.exception.EnrollmentNotFoundException;
+import com.example.enrollment.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +69,7 @@ public class EnrollmentService {
 
         // 본인 신청한 것만 가능
         if (!enrollment.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("본인의 수강 신청만 확정할 수 있습니다.");
+            throw new UnauthorizedException("본인의 수강 신청만 확정할 수 있습니다.");
         }
 
         enrollment.confirm();
@@ -83,7 +84,7 @@ public class EnrollmentService {
 
         // 본인 신청한 것만 가능
         if (!enrollment.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("본인의 수강 신청만 확정할 수 있습니다.");
+            throw new UnauthorizedException("본인의 수강 신청만 취소할 수 있습니다.");
         }
 
         // CONFIRMED 상태면 정원 감소
