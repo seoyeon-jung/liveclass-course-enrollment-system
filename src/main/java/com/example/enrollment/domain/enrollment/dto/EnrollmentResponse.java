@@ -14,6 +14,7 @@ public class EnrollmentResponse {
     private final Long courseId;
     private final String courseTitle;
     private final EnrollmentStatus status;
+    private final LocalDateTime confirmedAt;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
@@ -23,6 +24,7 @@ public class EnrollmentResponse {
         this.courseId = enrollment.getCourse().getId();
         this.courseTitle = enrollment.getCourse().getTitle();
         this.status = enrollment.getStatus();
+        this.confirmedAt = enrollment.getConfirmedAt();
         this.createdAt = enrollment.getCreatedAt();
         this.updatedAt = enrollment.getUpdatedAt();
     }
