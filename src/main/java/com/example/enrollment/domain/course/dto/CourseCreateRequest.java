@@ -27,4 +27,15 @@ public class CourseCreateRequest {
     @NotNull(message = "종료일은 필수입니다.")
     private LocalDate endDate;
 
+    // 테스트용 생성자
+    public CourseCreateRequest(String title, String description, int price, int capacity,
+                               LocalDate startDate, LocalDate endDate) {
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.capacity = capacity;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
 }
