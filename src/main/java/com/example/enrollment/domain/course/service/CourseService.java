@@ -7,6 +7,7 @@ import com.example.enrollment.domain.course.entity.Course;
 import com.example.enrollment.domain.course.entity.CourseStatus;
 import com.example.enrollment.domain.course.repository.CourseRepository;
 import com.example.enrollment.global.exception.CourseNotFoundException;
+import com.example.enrollment.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +59,7 @@ public class CourseService {
                 .orElseThrow(() -> new CourseNotFoundException(courseId));
 
         if (!course.getCreatorId().equals(creatorId)) {
-            throw new IllegalArgumentException("본인의 강의만 수정할 수 있습니다.");
+            throw new UnauthorizedException("본인의 강의만 수정할 수 있습니다.");
         }
 
         course.changeStatus(request.getStatus());
