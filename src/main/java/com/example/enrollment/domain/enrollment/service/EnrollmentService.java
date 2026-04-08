@@ -87,17 +87,16 @@ public class EnrollmentService {
             throw new UnauthorizedException("본인의 수강 신청만 취소할 수 있습니다.");
         }
 
-        // CONFIRMED 상태면 정원 감소
-        if (enrollment.getStatus() == EnrollmentStatus.CANCELLED) {
+        // PENDING or CONFIRMED 일 때만 정원 감소
+        boolean shouldDecreaseCount = enrollment.getStatus() == EnrollmentStatus.PENDING
+                || enrollment.getStatus() == EnrollmentStatus.CONFIRMED;
+
+        enrollment.cancel(); // CANCELLED이면 예외 발생
+
+        if (shouldDecreaseCount) {
             enrollment.getCourse().decreaseCount();
         }
 
-        // PENDING 상태도 정원 감소
-        if (enrollment.getStatus() == EnrollmentStatus.PENDING) {
-            enrollment.getCourse().decreaseCount();
-        }
-
-        enrollment.cancel();
         return new EnrollmentResponse(enrollment);
     }
 
